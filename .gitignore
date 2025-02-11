@@ -1,0 +1,7 @@
+#python
+venv/
+.pylintrc
+__pycache__/
+
+#ide
+.vscode
