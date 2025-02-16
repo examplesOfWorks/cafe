@@ -6,9 +6,20 @@ from orders.forms import CreateOrderForm, CreateOrderItemForm, CreateMealForm, E
 from django.forms import ValidationError
 from django.db import transaction
 from django.contrib import messages
+from orders.search_utils import q_search
 
 def show_orders(request):
-    orders = (
+    query = request.GET.get('q', None)
+
+    if query:
+        orders = q_search(query).prefetch_related(
+            Prefetch(
+                "orderitems_set",
+                queryset=OrderItems.objects.select_related('meal')
+            )
+        )
+    else:
+        orders = (
         Orders.objects.all()
         .prefetch_related(
             Prefetch(
@@ -20,9 +31,8 @@ def show_orders(request):
     
     context = {
         'title': 'Все заказы',
-        'orders': orders
+        'orders': orders,
     }
-    
     return render(request, 'index.html', context)
 
 def create_order(request):

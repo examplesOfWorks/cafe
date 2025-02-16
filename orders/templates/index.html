@@ -1,9 +1,33 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block search %}
+    <form class="d-flex" role="search" action="{% url "orders:search" %}" method="get">
+        <input class="form-control me-2" type="search" name="q" placeholder="Поиск" aria-label="Search">
+        <button class="btn btn-outline-success me-2" type="submit">Поиск</button>
+        {% if request.GET.q %}
+            <button class="btn btn-outline-secondary" type="submit" formaction="{% url 'orders:show_orders' %}">Сбросить</button>
+        {% endif %}
+    </form>
+{% endblock search %}
+
 {% block content %}
+
+    {% if request.GET.q %}
+        <h3 class="mt-4">Результаты поиска по запросу "{{ request.GET.q }}"</h3>
+        
+        {% if not orders %}
+            <h3 class="mt-4">По запросу ничего не найдено</h3>
+        {% endif %}
+
+    {% endif %}
+
     {% if orders %}
-    <h1>Все заказы</h1> 
+
+    {% if not request.GET.q %}
+        <h1>Все заказы</h1> 
+    {% endif %}
+
     <a class="btn btn-primary my-3" href="{% url 'orders:create_order' %}">Создать заказ</a>
     
         <table class="table table-bordered">
@@ -81,9 +105,11 @@
         </table>
 
     {% else %}
-
-        <p class="lead mt-3" >Пока здесь нет заказов, пожалуйста, создайте новый</p>
-        <a class="btn btn-primary" href="{% url 'orders:create_order' %}">Создать заказ</>
+        {% if not request.GET.q %}
+            <p class="lead mt-3" >Пока здесь нет заказов, пожалуйста, создайте новый</p>
+            <a class="btn btn-primary" href="{% url 'orders:create_order' %}">Создать заказ</>
+        {% endif %}
     {% endif %}
+
     
 {% endblock content %}
