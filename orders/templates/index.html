@@ -2,5 +2,67 @@
 {% load static %}
 
 {% block content %}
-<h1>Отображение всех заказов<h1>
+    {% if orders %}
+    <h1>Все заказы</h1> 
+    <a class="btn btn-primary my-3" href="{% url 'orders:create_order' %}">Создать заказ</a>
+    
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>номер стола</th>
+                    <th>список блюд</th>
+                    <th>список цен</th>
+                    <th>количество блюд</th>
+                    <th>общая стоимость</th>
+                    <th>статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.table_number }}</td>
+                    <td>
+                        <table>
+                            {% for item in order.orderitems_set.all %}
+                                <tr>
+                                    <td>{{ item.meal.name }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>
+                        <table>
+                            {% for item in order.orderitems_set.all %}
+                                <tr>
+                                    <td>{{ item.meal.price }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>
+                        <table>
+                            {% for item in order.orderitems_set.all %}
+                                <tr>
+                                    <td>{{ item.quantity }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>{{ order.total_price }}</td>
+                    <td>{{ order.status }}</td>
+                    <td><a href="{% url 'orders:edit_status' order.id %}">Изменить статус</a></td>
+                    <td><a href="{% url 'orders:delete_order' order.id %}">Удалить</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+
+        <p class="lead mt-3" >Пока здесь нет заказов, пожалуйста, создайте новый</p>
+        <a class="btn btn-primary" href="{% url 'orders:create_order' %}">Создать заказ</>
+    {% endif %}
+    
 {% endblock content %}

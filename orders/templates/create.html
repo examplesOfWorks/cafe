@@ -1,6 +1,52 @@
 {% extends "base.html" %}
 {% load static %}
 
+<h1 class="mt-3">{{ title }}<h1>
+
 {% block content %}
-<h1>{{ title }}<h1>
+
+  <form method = "post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-4 mb-5">
+        <label class="form-label my-3" for="table_number"><b>{{ order_form.table_number.label }}</b></label>
+          {{ order_form.table_number }} 
+      </div>
+    </div>
+
+      <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>{{ meal_form.name.label}}</th>
+                <th>{{ meal_form.price.label}} </th>
+                <th>{{ order_item_form.quantity.label}} </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ meal_form.name }}</td>
+                <td>{{ meal_form.price }}</td>
+                <td>{{ order_item_form.quantity }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary mt-3" type="submit">Сохранить</button>
+  </form>
+  <button type="button" class="btn btn-outline-primary mt-1" id="addnewinputbtn" name="button">Добавить блюдо</button>
+    
+  
+    <script type="text/javascript">
+      $(document)
+        .ready(
+          function() {
+            $('#addnewinputbtn')
+              .click(
+                function() {
+                  
+          $('<tr>').appendTo('tbody').html(
+              '<td>{{ meal_form.name }}</td><td>{{ meal_form.price }}</td><td>{{ order_item_form.quantity }}</td>');
+        });
+
+          });
+    </script>
 {% endblock content %}
