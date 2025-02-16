@@ -6,12 +6,22 @@ from orders.forms import CreateOrderForm, CreateOrderItemForm, CreateMealForm, E
 from django.forms import ValidationError
 from django.db import transaction
 from django.contrib import messages
-from orders.search_utils import q_search
+from orders.search_utils import q_search, filter_by_status
+
+
 
 def show_orders(request):
-    query = request.GET.get('q', None)
+    query = request.GET.get('q', None)  
 
-    if query:
+    waiting = request.GET.get('waiting', None)
+    ready = request.GET.get('ready', None)
+    paid = request.GET.get('paid', None)
+
+    if waiting or ready or paid:
+
+        orders = filter_by_status(waiting, ready, paid)
+
+    elif query:
         orders = q_search(query).prefetch_related(
             Prefetch(
                 "orderitems_set",
@@ -139,3 +149,4 @@ def page_not_found(request, exception):
         'title': 'Страница не найдена',
     }
     return HttpResponseNotFound(render(request, '404.html', context))
+
