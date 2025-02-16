@@ -53,6 +53,23 @@ class CreateMealForm(forms.ModelForm):
             'required': 'required',
         })
         )
+    
+class EditStatusForm(forms.ModelForm):
+    class Meta:
+        model = Orders
+        fields = ['status']
+
+    status = forms.ChoiceField(
+        label='Статус', 
+        widget=forms.Select(
+            attrs={'class': 'form-control'}
+            ),
+        choices=[
+            ("В ожидании", "В ожидании"),
+            ("Готово", "Готово"),
+            ("Оплачено", "Оплачено"),
+        ],
+    )
 
 
 

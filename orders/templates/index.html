@@ -10,18 +10,20 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>номер стола</th>
-                    <th>список блюд</th>
-                    <th>список цен</th>
-                    <th>количество блюд</th>
-                    <th>общая стоимость</th>
-                    <th>статус</th>
+                    <th>Номер стола</th>
+                    <th>Список блюд</th>
+                    <th>Список цен</th>
+                    <th>Количество блюд</th>
+                    <th>Стоимость позиции</th>
+                    <th>Общая стоимость</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in orders %}
                 <tr>
-                    <td>{{ order.id }}</td>
+                    <td><b>{{ order.id }}</b></td>
                     <td>{{ order.table_number }}</td>
                     <td>
                         <table>
@@ -36,7 +38,7 @@
                         <table>
                             {% for item in order.orderitems_set.all %}
                                 <tr>
-                                    <td>{{ item.meal.price }}</td>
+                                    <td>{{ item.meal.price }} руб.</td>
                                 </tr>
                             {% endfor %}
                         </table>
@@ -45,15 +47,34 @@
                         <table>
                             {% for item in order.orderitems_set.all %}
                                 <tr>
-                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.quantity }} шт.</td>
                                 </tr>
                             {% endfor %}
                         </table>
                     </td>
-                    <td>{{ order.total_price }}</td>
+                    <td>
+                        <table>
+                            {% for item in order.orderitems_set.all %}
+                                <tr>
+                                    <td>{{ item.item_price }} руб.</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>{{ order.total_price }} руб.</td>
                     <td>{{ order.status }}</td>
-                    <td><a href="{% url 'orders:edit_status' order.id %}">Изменить статус</a></td>
-                    <td><a href="{% url 'orders:delete_order' order.id %}">Удалить</a></td>
+                    <td>
+                        <div class="row">
+                            <div class="col">
+                                <a href="{% url 'orders:edit_status' order.id %}" class="btn btn-outline-primary">Изменить статус</a>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col">
+                                <a href="{% url 'orders:delete_order' order.id %}" class="btn btn-outline-danger">Удалить заказ</a>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

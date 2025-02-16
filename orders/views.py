@@ -2,7 +2,7 @@ from django.http import Http404, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Prefetch
 from orders.models import Orders, OrderItems
-from orders.forms import CreateOrderForm, CreateOrderItemForm, CreateMealForm
+from orders.forms import CreateOrderForm, CreateOrderItemForm, CreateMealForm, EditStatusForm
 from django.forms import ValidationError
 from django.db import transaction
 from django.contrib import messages
@@ -77,11 +77,34 @@ def create_order(request):
         return redirect('orders:create_order')
 
 def edit_status(request, id):
-    context = {
-        'title': 'Изменение статуса заказа',
-    }
+    statuses_list = ['В ожидании', 'Готово', 'Оплачено']
+
+    orders = Orders.objects.filter(pk=id).prefetch_related(
+            Prefetch(
+                "orderitems_set",
+                queryset=OrderItems.objects.select_related('meal')
+            )
+        )
     
-    return render(request, 'edit_status.html', context)
+    try:
+        old_data = get_object_or_404(Orders, id=id)
+    except Exception:
+        raise Http404('Такого заказа не существует')
+
+    if request.method =='POST':
+        form = EditStatusForm(request.POST, instance=old_data)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    else:
+        form = EditStatusForm(instance = old_data)
+        context = {
+            'form':form,
+            'statuses_list': statuses_list,
+            'title': 'Изменение статуса',
+            'orders': orders
+        }
+        return render(request, 'edit_status.html', context)
 
 def delete_order(request, id):
     try:

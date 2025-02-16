@@ -2,5 +2,68 @@
 {% load static %}
 
 {% block content %}
-<h1>{{ title }}<h1>
+    <form method="post">
+        {% csrf_token %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Номер стола</th>
+                    <th>Список блюд</th>
+                    <th>Список цен</th>
+                    <th>Количество блюд</th>
+                    <th>Стоимость позиции</th>
+                    <th>Общая стоимость</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td><b>{{ order.id }}</b></td>
+                    <td>{{ order.table_number }}</td>
+                    <td>
+                        <table>
+                            {% for item in order.orderitems_set.all %}
+                                <tr>
+                                    <td>{{ item.meal.name }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>
+                        <table>
+                            {% for item in order.orderitems_set.all %}
+                                <tr>
+                                    <td>{{ item.meal.price }} руб.</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>
+                        <table>
+                            {% for item in order.orderitems_set.all %}
+                                <tr>
+                                    <td>{{ item.quantity }} шт.</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>
+                        <table>
+                            {% for item in order.orderitems_set.all %}
+                                <tr>
+                                    <td>{{ item.item_price }} руб.</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>{{ order.total_price }} руб.</td>
+                    <td>{{ form.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
 {% endblock content %}
