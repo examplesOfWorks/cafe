@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.http import Http404, HttpResponseNotFound
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Prefetch
 from orders.models import Orders, OrderItems
 from orders.forms import CreateOrderForm, CreateOrderItemForm, CreateMealForm
@@ -83,8 +84,25 @@ def edit_status(request, id):
     return render(request, 'edit_status.html', context)
 
 def delete_order(request, id):
-    context = {
-        'title': 'Удаление заказа',
-    }
+    try:
+        data = get_object_or_404(Orders, id=id)
+    except Exception:
+        raise Http404('Такого заказа не существует')
     
-    return render(request, 'delete.html', context)
+    if request.method == 'POST':
+        data.delete()
+        messages.success(request, 'Заказ удален')
+        return redirect('/')
+    else:
+        context = {
+            'title': 'Удаление заказа',
+        }
+        
+        return render(request, 'delete.html', context)
+
+def page_not_found(request, exception):
+    context = {
+        'exception': exception,
+        'title': 'Страница не найдена',
+    }
+    return HttpResponseNotFound(render(request, '404.html', context))
