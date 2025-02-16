@@ -20,6 +20,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('orders.urls')),
+    path('calculations/', include('calculations.urls')),
 ]
 
 handler404 = 'orders.views.page_not_found'

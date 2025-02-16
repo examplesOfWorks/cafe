@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<h1 class="mt-3">{{ title }}<h1>
+
+{% if total_price %}
+    <h4>Общий объём выручки за заказы со статусом “оплачено” равен <b>{{ total_price }} руб.</b></h4>
+
+    <p class="lead my-3">Детали отображены в таблице:</p>
+        
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Номер стола</th>
+                <th>Список блюд</th>
+                <th>Список цен</th>
+                <th>Количество блюд</th>
+                <th>Стоимость позиции</th>
+                <th>Общая стоимость</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><b>{{ order.id }}</b></td>
+                <td>{{ order.table_number }}</td>
+                <td>
+                    <table>
+                        {% for item in order.orderitems_set.all %}
+                            <tr>
+                                <td>{{ item.meal.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        {% for item in order.orderitems_set.all %}
+                            <tr>
+                                <td>{{ item.meal.price }} руб.</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        {% for item in order.orderitems_set.all %}
+                            <tr>
+                                <td>{{ item.quantity }} шт.</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        {% for item in order.orderitems_set.all %}
+                            <tr>
+                                <td>{{ item.item_price }} руб.</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>{{ order.total_price }} руб.</td>
+                <td>{{ order.status }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td><b>Итого:</b></td>
+                <td colspan="6" align="right"><b>{{ total_price }} руб.</b></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    
+{% else %}
+    <p class="lead mt-3" >Заказы со статусом “оплачено” пока отсутствуют</p>
+{% endif %}
+
+{% endblock content %}
