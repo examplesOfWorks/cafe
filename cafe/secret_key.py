@@ -1,0 +1,1 @@
+secret_key = 'django-insecure-c4urpks*6*c$jap^)6$7k4+a1dikr#fci=(qfmqf&3-&4+87tl'
