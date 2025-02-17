@@ -4,6 +4,6 @@ from calculations import views
 
 app_name = 'calculations'
 
-urlpatterns = [
+urlpatterns: list = [
     path('profit/', views.profit, name='profit'),
 ]

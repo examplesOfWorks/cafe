@@ -134,11 +134,13 @@
                                             <a href="{% url 'orders:edit_status' order.id %}" class="btn btn-outline-primary">Изменить статус</a>
                                         </div>
                                     </div>
-                                    <div class="row mt-2">
-                                        <div class="col">
-                                            <a href="{% url 'orders:edit_order' order.id %}" class="btn btn-outline-secondary">Редактировать заказ</a>
+                                    {% if order.status != 'Оплачено' %}
+                                        <div class="row mt-2">
+                                            <div class="col">
+                                                <a href="{% url 'orders:edit_order' order.id %}" class="btn btn-outline-secondary">Редактировать заказ</a>
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <div class="row mt-2">
                                         <div class="col">
                                             <a href="{% url 'orders:delete_order' order.id %}" class="btn btn-outline-danger">Удалить заказ</a>

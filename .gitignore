@@ -1,3 +1,7 @@
+#security
+secret_key.py
+db_secret.py
+
 #python
 venv/
 .pylintrc
