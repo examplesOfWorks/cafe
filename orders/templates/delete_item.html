@@ -5,9 +5,10 @@
 <div class="container">
     <form method="post">
         {% csrf_token %}
-        <h1>Подтвердите удаление заказа</h1>
+        <h1>Подтвердите удаление блюда</h1>
         <input class="btn btn-danger" type = "submit" value="Да">
-        <a class="btn btn-primary" href='/'>Нет</a>
+        <a class="btn btn-primary" href='/orders/edit-order/{{ order_id }}'>Нет</a>
+        {{ data_order.as_table }}
     </form>
 </div>
 {% endblock content %}

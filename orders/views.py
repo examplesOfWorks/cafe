@@ -1,12 +1,11 @@
-from django.http import Http404, HttpResponseNotFound
-from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Prefetch
-from orders.models import Orders, OrderItems
-from orders.forms import CreateOrderForm, CreateOrderItemForm, CreateMealForm, EditStatusForm
-from django.forms import ValidationError
 from django.db import transaction
 from django.contrib import messages
+from django.db.models import Prefetch
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404, HttpResponseNotFound
 from orders.search_utils import q_search, filter_by_status
+from orders.models import Orders, OrderItems
+from orders.forms import CreateOrderForm, CreateOrderItemForm, CreateMealForm, EditStatusForm
 
 
 
@@ -125,14 +124,42 @@ def edit_status(request, id):
             'orders': orders
         }
         return render(request, 'edit_status.html', context)
+    
+def edit_order(request, id):
+    try:
+        data = get_object_or_404(Orders, id=id)
+    except Exception:
+        raise Http404('Такого заказа не существует')
+    
+    
+    orders = Orders.objects.filter(pk=id).prefetch_related(
+        Prefetch(
+        "orderitems_set",
+        queryset=OrderItems.objects.select_related('meal')
+        )
+    )
+    meal_form = CreateMealForm()
+    context = {
+        'title': 'Редактирование заказа',
+        'orders': orders,
+        'meal_form': meal_form
+    }
+
+    return render(request, 'edit_order.html', context)
 
 def delete_order(request, id):
     try:
         data = get_object_or_404(Orders, id=id)
     except Exception:
         raise Http404('Такого заказа не существует')
-    
+
     if request.method == 'POST':
+        
+        items = OrderItems.objects.filter(order=data)
+        for item in items:
+            item.meal.delete()
+            # item.delete()
+        
         data.delete()
         messages.success(request, 'Заказ удален')
         return redirect('/')
@@ -142,6 +169,73 @@ def delete_order(request, id):
         }
         
         return render(request, 'delete.html', context)
+    
+def delete_item(request, id):
+    try:
+        data = get_object_or_404(OrderItems, id=id)
+    except Exception:
+        raise Http404('Блюда с таким id не существует')
+    
+    if request.method == 'POST':
+        data.order.total_price = int(data.order.total_price) - int(data.item_price)
+        data.order.save()
+        data.meal.delete()
+        data.delete()
+        messages.success(request, 'Блюдо удалено')
+        return redirect(f'/edit-order/{int(data.order.id)}')
+    else:
+        context = {
+            'title': 'Удаление позиции заказа',
+        }
+        
+        return render(request, 'delete_item.html', context)
+    
+def add_items(request, id):
+    try:
+        data = get_object_or_404(Orders, id=id)
+    except Exception:
+        raise Http404('Заказ с таким id не существует')
+    
+    with transaction.atomic(): 
+        if request.method == 'POST':
+            order_form = CreateOrderForm(request.POST, instance=data)
+
+            for i in range(len(request.POST.getlist('name'))):
+                meal_form = CreateMealForm(request.POST)
+                order_item_form = CreateOrderItemForm(request.POST)
+                if meal_form.is_valid() and order_item_form.is_valid():
+                    name = request.POST.getlist('name')
+                    price = request.POST.getlist('price')
+                    quantity = request.POST.getlist('quantity')
+                    data = {'name': name[i], 'price': price[i], 'quantity': quantity[i]}
+                    meal_form.instance.name = data['name']
+                    meal_form.instance.price = data['price']
+                    meal_form.save()
+
+                    order_item_form.instance.quantity = data['quantity']
+                    order_item_form.instance.meal = meal_form.instance
+                    order_item_form.instance.order = order_form.instance
+                    order_item_form.instance.item_price = int(data['quantity']) * int(data['price'])
+                    order_item_form.save()
+
+                    order_form.instance.total_price += order_item_form.instance.item_price
+                    order_form.save()
+
+            return redirect('/')
+        else:
+            order_form =CreateOrderForm(instance=data)
+            meal_form = CreateMealForm()
+            order_item_form = CreateOrderItemForm()
+            context = {
+                'title': 'Добавление блюд',
+                'order': data,
+                'meal_form': meal_form,
+                'order_item_form': order_item_form,
+                'order_form': order_form
+            }
+            
+            return render(request, 'add_items.html', context)
+    
 
 def page_not_found(request, exception):
     context = {

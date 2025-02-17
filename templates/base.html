@@ -29,11 +29,11 @@
           </div>
         </div>
       </nav>
-    <div class="container">
+    {% comment %} <div class="container"> {% endcomment %}
       {% include "includes/notifications.html" %}
       {% block content %}
       {% endblock %}
-    </div>
+    {% comment %} </div> {% endcomment %}
     <script src="{% static "js/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
 </body>
 </html>

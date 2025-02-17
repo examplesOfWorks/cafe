@@ -13,44 +13,32 @@
 
 {% block content %}
 
-    {% if request.GET.q %}
-        <h3 class="mt-4">Результаты поиска по запросу "{{ request.GET.q }}"</h3>
-        
-        {% if not orders %}
-            <h3 class="mt-4">По запросу ничего не найдено</h3>
-        {% endif %}
-
-    {% endif %}
-
-    {% if orders %}
-
+    <div class="container-fluid">
         <div class="row">
             <div class="col-2">
-                <p>Фильтрация по статусу заказа</p>
-            
+                <p class="lead my-3">Фильтрация по статусу заказа</p>
                 <form method="get">
-
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="on" id="flexCheckDefault1" name="waiting"
                         {% if request.GET.waiting == 'on' %} checked {% endif %}>
                         <label class="form-check-label" for="flexCheckDefault1">
                             В ожидании
                         </label>
-                      </div>
-                      <div class="form-check">
+                    </div>
+                    <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="on" id="flexCheckDefault2" name="ready"
                         {% if request.GET.ready == 'on' %} checked {% endif %}>
                         <label class="form-check-label" for="flexCheckDefault2">
                             Готово
                         </label>
-                      </div>
-                      <div class="form-check">
+                    </div>
+                    <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="on" id="flexCheckDefault3" name="paid"
                         {% if request.GET.paid == 'on' %} checked {% endif %}>
                         <label class="form-check-label" for="flexCheckDefault3">
                             Оплачено
                         </label>
-                      </div>
+                    </div>
                     <div>
                         {% if request.GET.q %}
                             <input type="hidden" name="q" value="{{ request.GET.q }}">
@@ -58,112 +46,114 @@
                     </div>
                     <button class="btn btn-primary" type="submit">Применить</button>
                 </form>
-
-                        {% comment %} <label for="flexCheckDefault1">
-                            В ожидании
-                        </label>
-                        <input type="checkbox" name="waiting" id="flexCheckDefault1" value="on" {% if request.GET.waiting == 'on' %} checked {% endif %}>
-                        <label for="flexCheckDefault2">
-                            Готово
-                        </label>
-                        <input type="checkbox" name="done" id="flexCheckDefault2" value="on" {% if request.GET.done == 'on' %} checked {% endif %}>
-                        <label for="flexCheckDefault3">
-                            Оплачено
-                        </label>
-                        <input type="checkbox" name="paid" id="flexCheckDefault3" value="on" {% if request.GET.paid == 'on' %} checked {% endif %}> {% endcomment %}
-                        
-
-
             </div>
-
             <div class="col-10">
-                {% if not request.GET.q %}
-                    <h1>Все заказы</h1> 
+
+                {% if request.GET.q %}
+                    <h3 class="mt-4">Результаты поиска по запросу "{{ request.GET.q }}"</h3>
                 {% endif %}
 
-                <a class="btn btn-primary my-3" href="{% url 'orders:create_order' %}">Создать заказ</a>
-            
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Номер стола</th>
-                            <th>Список блюд</th>
-                            <th>Список цен</th>
-                            <th>Количество блюд</th>
-                            <th>Стоимость позиции</th>
-                            <th>Общая стоимость</th>
-                            <th>Статус</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr>
-                            <td><b>{{ order.id }}</b></td>
-                            <td>{{ order.table_number }}</td>
-                            <td>
-                                <table>
-                                    {% for item in order.orderitems_set.all %}
-                                        <tr>
-                                            <td>{{ item.meal.name }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </td>
-                            <td>
-                                <table>
-                                    {% for item in order.orderitems_set.all %}
-                                        <tr>
-                                            <td>{{ item.meal.price }} руб.</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </td>
-                            <td>
-                                <table>
-                                    {% for item in order.orderitems_set.all %}
-                                        <tr>
-                                            <td>{{ item.quantity }} шт.</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </td>
-                            <td>
-                                <table>
-                                    {% for item in order.orderitems_set.all %}
-                                        <tr>
-                                            <td>{{ item.item_price }} руб.</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </td>
-                            <td>{{ order.total_price }} руб.</td>
-                            <td>{{ order.status }}</td>
-                            <td>
-                                <div class="row">
-                                    <div class="col">
-                                        <a href="{% url 'orders:edit_status' order.id %}" class="btn btn-outline-primary">Изменить статус</a>
+                {% if not orders %}
+
+                    {% if request.GET %}
+
+                        <h3 class="mt-4">По запросу ничего не найдено</h3>
+
+                    {% else %}
+
+                        <p class="lead mt-3" >Пока здесь нет заказов, пожалуйста, создайте новый</p>
+                        <a class="btn btn-primary" href="{% url 'orders:create_order' %}">Создать заказ</a>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <a class="btn btn-primary my-3" href="{% url 'orders:create_order' %}">Создать заказ</a>
+                    
+                
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Номер стола</th>
+                                <th>Список блюд</th>
+                                <th>Список цен</th>
+                                <th>Количество блюд</th>
+                                <th>Стоимость позиции</th>
+                                <th>Общая стоимость</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td><b>{{ order.id }}</b></td>
+                                <td>{{ order.table_number }}</td>
+                                <td>
+                                    <table>
+                                        {% for item in order.orderitems_set.all %}
+                                            <tr>
+                                                <td>{{ item.meal.name }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                                <td>
+                                    <table>
+                                        {% for item in order.orderitems_set.all %}
+                                            <tr>
+                                                <td>{{ item.meal.price }} руб.</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                                <td>
+                                    <table>
+                                        {% for item in order.orderitems_set.all %}
+                                            <tr>
+                                                <td>{{ item.quantity }} шт.</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                                <td>
+                                    <table>
+                                        {% for item in order.orderitems_set.all %}
+                                            <tr>
+                                                <td>{{ item.item_price }} руб.</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                                <td>{{ order.total_price }} руб.</td>
+                                <td>{{ order.status }}</td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col">
+                                            <a href="{% url 'orders:edit_status' order.id %}" class="btn btn-outline-primary">Изменить статус</a>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col">
-                                        <a href="{% url 'orders:delete_order' order.id %}" class="btn btn-outline-danger">Удалить заказ</a>
+                                    <div class="row mt-2">
+                                        <div class="col">
+                                            <a href="{% url 'orders:edit_order' order.id %}" class="btn btn-outline-secondary">Редактировать заказ</a>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                    <div class="row mt-2">
+                                        <div class="col">
+                                            <a href="{% url 'orders:delete_order' order.id %}" class="btn btn-outline-danger">Удалить заказ</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                {% endif %}
+
             </div>
         </div>
-    {% else %}
-        {% if not request.GET.q %}
-            <p class="lead mt-3" >Пока здесь нет заказов, пожалуйста, создайте новый</p>
-            <a class="btn btn-primary" href="{% url 'orders:create_order' %}">Создать заказ</>
-        {% endif %}
-    {% endif %}
-
+    </div>
     
 {% endblock content %}

@@ -2,8 +2,9 @@
 {% load static %}
 
 {% block content %}
-<h1 class="mt-3">{{ title }}</h1>
-<p class="lead my-3">Выберите новый статус заказа в выпадающем списке:</p>
+<div class="container">
+    <h1 class="mt-3">{{ title }}</h1>
+    <p class="lead my-3">Выберите новый статус заказа в выпадающем списке:</p>
     <form method="post">
         {% csrf_token %}
         <table class="table table-bordered">
@@ -68,4 +69,5 @@
         </table>
         <button type="submit" class="btn btn-primary">Сохранить</button>
     </form>
+</div>
 {% endblock content %}
